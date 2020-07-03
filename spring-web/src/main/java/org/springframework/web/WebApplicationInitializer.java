@@ -174,6 +174,13 @@ import javax.servlet.ServletException;
  * @see org.springframework.web.servlet.support.AbstractDispatcherServletInitializer
  * @see org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer
  */
+
+
+ //* 现在JavaConfig的配置方式已经逐步取代web.xml传统的xml配置方式。
+ //* 项目启动，web容器会加载WebApplicationInitializer这个接口的实现类，我们可以在实现类中
+ //* 添加具体listener，servlet从而达到替换web.xml的目的。
+ //* 下面援引spring官网的一段样例：https://docs.spring.io/spring/docs/5.2.7.RELEASE/spring-framework-reference/web.html#spring-web
+
 public interface WebApplicationInitializer {
 
 	/**

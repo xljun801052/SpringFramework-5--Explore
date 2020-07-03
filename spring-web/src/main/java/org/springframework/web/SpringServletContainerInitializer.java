@@ -109,7 +109,20 @@ import org.springframework.util.ReflectionUtils;
  * @see #onStartup(Set, ServletContext)
  * @see WebApplicationInitializer
  */
+
+
+ //* 配合注解@HandlesTypes它可以将其指定的Class对象作为参数传递到onStartup方法中。
+ //* 进而在onStartup方法中获取Class对象的具体实现类，进而调用实现类中的具体方法。
+ //* SpringServletContainerInitializer类中@HandlesTypes指定的Class对象
+ //* 是WebApplicationInitializer.Class。
+
 @HandlesTypes(WebApplicationInitializer.class)
+
+ //* 至于这里为什么要实现ServletContainerInitializer接口？
+ //* 获取onStartup()方法！这个方法传入一个Set集合来装载所有的WebApplicationInitializer接口实现类和一个web容器的上下文环境
+ //* Set-->List<WebApplicationInitializer>：都是WebApplicationInitializer接口实现者，那么就可以被加载到，利用这点来初始化Spring容器设置相关参数
+ //* ServletContext传入Web容器上下文环境参数
+
 public class SpringServletContainerInitializer implements ServletContainerInitializer {
 
 	/**
@@ -138,6 +151,15 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 	 * @see WebApplicationInitializer#onStartup(ServletContext)
 	 * @see AnnotationAwareOrderComparator
 	 */
+
+
+//	 * 1-spring如何与tomcat结合？
+//	 * 		①servlet3.0版本以后提出一个新的规范，通过SPI【即service privider interface，是jdk为厂商和插件提供的一种解耦机制】机制实现。对于项目中的类或者方法想要在启动时候被web容器（此处以tomcat为例）
+//	 * 		调用的话，需要在项目的根路径下建立一个文件：resources/META-INF/services/javax.servlet.ServletContainerInitializer
+//	 * 		然后在文件中写你想被tomcat调用的类名即可（注意：是全路径类名！）
+//	 * 		②内容：对于spring来说只要在项目的根路径下resources/META-INF/services/javax.servlet.ServletContainerInitializer
+//	 * 		创建这么一个文件，并在文件中写出类名【这里spring-web项目写的是SpringServletContainerInitializer】,那么tomcat
+
 	@Override
 	public void onStartup(@Nullable Set<Class<?>> webAppInitializerClasses, ServletContext servletContext)
 			throws ServletException {
@@ -151,6 +173,9 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
 						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
 					try {
+
+						 //* 利用反射获取WebApplicationInitializer接口的实现者实例
+
 						initializers.add((WebApplicationInitializer)
 								ReflectionUtils.accessibleConstructor(waiClass).newInstance());
 					}
@@ -162,6 +187,7 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 		}
 
 		if (initializers.isEmpty()) {
+			//意思就是没有检测到具体的WebApplicationInitializer初始化器
 			servletContext.log("No Spring WebApplicationInitializer types detected on classpath");
 			return;
 		}

@@ -42,9 +42,16 @@ test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
 LICENSE
+LICENSE.txt
+SECURITY.md
 .editorconfig
 .gitattributes
 .mailmap
 .github
 CODE_OF_CONDUCT.adoc
 *.md
+CONTRIBUTING.md
+gradlew
+gradlew.bat
+import-*
+/spring-xlys-maven/target/
