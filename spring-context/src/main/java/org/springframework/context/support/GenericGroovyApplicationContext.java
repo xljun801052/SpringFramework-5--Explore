@@ -121,7 +121,7 @@ public class GenericGroovyApplicationContext extends GenericApplicationContext i
 	private final GroovyBeanDefinitionReader reader = new GroovyBeanDefinitionReader(this);
 
 	private final BeanWrapper contextWrapper = new BeanWrapperImpl(this);
-
+	DefaultListableBeanFactory
 	private MetaClass metaClass = GroovySystem.getMetaClassRegistry().getMetaClass(getClass());
 
 

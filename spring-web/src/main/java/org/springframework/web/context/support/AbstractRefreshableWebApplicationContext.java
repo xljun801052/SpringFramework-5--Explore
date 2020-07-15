@@ -166,7 +166,10 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		//将所有的BeanPostProcessor后置处理器加入一个beanPostProcessors的CopyOnWriteArrayList中！
+			//1)这里留一个疑问：这个CopyOnWriteArrayList有啥作用，为什么要用这个List实现类？
 		beanFactory.addBeanPostProcessor(new ServletContextAwareProcessor(this.servletContext, this.servletConfig));
+		//忽略依赖的接口：将容器中依赖的接口加入到ignoredDependencyInterfaces【HashSet】
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
 		beanFactory.ignoreDependencyInterface(ServletConfigAware.class);
 

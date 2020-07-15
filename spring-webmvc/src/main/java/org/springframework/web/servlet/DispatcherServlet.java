@@ -997,6 +997,13 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @param response current HTTP response
 	 * @throws Exception in case of any kind of processing failure
 	 */
+
+//	SpringMVC分发请求流程：
+//		①在Spring容器初始化时扫描所有加了@Controller注解的类，并创建一个Map集合
+//		②遍历第一步中类里面所有的方法，寻找加了@RequestMapping注解【或者与@RequestMapping主要功能相同的注解】的方法，
+//		把@RequestMapping注解的值作为Map的key,把对应的方法对象作为Map的value存入Map.
+//		③根据用户请求的URI【非URL】来作为key去查Map,查到的化返回Method方法对象，否则返回找不到，通常是404
+//		④根据反射，调用对应的method
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
 		HandlerExecutionChain mappedHandler = null;
@@ -1009,10 +1016,13 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
+				//检查是不是文件上传,后续可以继续研究一下如何识别是否是文件上传！
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+				//1）获取HandlerExecutionChain执行链：
+				//这里虽说是获得执行链，但是本质上就是获取处理对应请求的类和方法（即从前面说的Map中获取value）
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
@@ -1020,6 +1030,8 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
+				//2）获取适配器adapter:为什么要获取是配置而不是直接执行第一步中的方法？原因在于添加@Controller注解和
+				// 实现Controller接口或者HttpRequestHandler接口两种方式都可以将类声明称处理器用来处理请求，这两种方式决定了...
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1037,6 +1049,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Actually invoke the handler.
+				//实际上真正调用处理器handler的地方，在这里进行处理请求，返回ModelAndView对象
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1229,6 +1242,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Nullable
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		//将获取执行链声明为一个组件，这里相当于
 		if (this.handlerMappings != null) {
 			for (HandlerMapping mapping : this.handlerMappings) {
 				HandlerExecutionChain handler = mapping.getHandler(request);
@@ -1265,6 +1279,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @throws ServletException if no HandlerAdapter can be found for the handler. This is a fatal error.
 	 */
 	protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
+		//handlerAdapters中一般有三个对象，对应handler【就是处理器，可以理解为加了@Controller注解的类】生成的三种实现：
+		// 	1.HttpRequestHandler接口实现
+		// 	2.Controller接口实现
+		//	3.@Controller注解添加
 		if (this.handlerAdapters != null) {
 			for (HandlerAdapter adapter : this.handlerAdapters) {
 				if (adapter.supports(handler)) {

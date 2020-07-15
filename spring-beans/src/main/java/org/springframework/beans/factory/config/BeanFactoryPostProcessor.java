@@ -60,6 +60,7 @@ import org.springframework.beans.BeansException;
  * @see PropertyResourceConfigurer
  */
 @FunctionalInterface
+//针对整个工厂生产出来的BeanDefinition作出修改或者注册
 public interface BeanFactoryPostProcessor {
 
 	/**

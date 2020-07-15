@@ -102,6 +102,8 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	public void invokeAndHandle(ServletWebRequest webRequest, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		//在这里invokeForRequest采用反射开始调用!
+		//考虑一个问题：SpringMVC如何获取参数值？我们之前有普通类型参数（String and so forth）、Map类型参数、对象类型参数...均是如何赋值？
 		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
 		setResponseStatus(webRequest);
 

@@ -1033,6 +1033,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * @see #registerBeanDefinition
 	 * @see #removeBeanDefinition
 	 */
+
+	/*一段BeanDefinition的思考！*/
+	/*Spring通过此方法可以向IOC容器注册外部由使用者自己构建的对象，使之成为由IOC容器管理的Bean Definition*/
+	//虽然可以能够后续人工手动注册bean,也能够进行覆盖一些已经存在的单实例的元数据等骚操作，但是尽早进行，以便容器可以进行正确的管理维护Bean
+	//官方不建议在运行时进行这种注册bean的操作，可能会引发一些并发访问异常，数据状态不一致的问题，所以要注册啥尽量采用传统方式进行
 	protected void resetBeanDefinition(String beanName) {
 		// Remove the merged bean definition for the given bean, if already created.
 		clearMergedBeanDefinition(beanName);
@@ -1070,6 +1075,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return isAllowBeanDefinitionOverriding();
 	}
 
+	/*Spring通过此方法可以向IOC容器注册外部由使用者自己构建的Object(s)，使之成为Bean Definition(单例的Bean)*/
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		super.registerSingleton(beanName, singletonObject);

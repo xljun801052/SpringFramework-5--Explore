@@ -66,6 +66,9 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 */
 	@Override
 	public final boolean supports(Object handler) {
+		//判断是否是HandlerMethod类型：加了@Controller注解的handler才算做这个HandlerMethod类型，后面通过反射调用方法就可以了
+		//【如果handler是实现了HttpRequestHandler接口，则是实现HttpRequestHandler这个类型】
+		//【如果handler是实现了Controller接口，则是实现Controller这个类型】
 		return (handler instanceof HandlerMethod && supportsInternal((HandlerMethod) handler));
 	}
 
@@ -83,7 +86,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	@Nullable
 	public final ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
+		//这里调用添加@Controller注解的handler的方法处理请求，所以可以直接转成HandlerMethod类型
 		return handleInternal(request, response, (HandlerMethod) handler);
 	}
 
